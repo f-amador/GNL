@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: framador <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: framador <framador@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/17 16:07:37 by framador          #+#    #+#             */
-/*   Updated: 2023/11/17 16:08:41 by framador         ###   ########.fr       */
+/*   Updated: 2025/05/31 12:37:14 by framador         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ char	*get_next_line(int fd)
 	static char	buff[BUFFER_SIZE + 1];
 
 	str = NULL;
-	if (fd < 0 || BUFFER_SIZE < 1 || fd >= FOPEN_MAX)
+	if (fd < 0 || BUFFER_SIZE < 1)
 	{
 		if (BUFFER_SIZE > 0)
 		{
@@ -29,6 +29,8 @@ char	*get_next_line(int fd)
 	while (buff[0] || read(fd, buff, BUFFER_SIZE) > 0)
 	{
 		str = ft_strjoin(str, buff);
+		if (!str)
+			return (NULL);
 		ft_buffflusher(buff);
 		if (str[ft_strlen(str) - 1] == 10)
 			break ;

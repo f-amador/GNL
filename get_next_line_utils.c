@@ -6,13 +6,13 @@
 /*   By: framador <framador@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/17 16:13:28 by framador          #+#    #+#             */
-/*   Updated: 2023/11/17 16:18:30 by framador         ###   ########.fr       */
+/*   Updated: 2025/05/31 12:38:29 by framador         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-size_t	ft_strlen(const char *s)
+size_t	ft_strlen(char *s)
 {
 	size_t	i;
 
@@ -28,7 +28,7 @@ size_t	ft_strlen(const char *s)
 	return (i);
 }
 
-char	*ft_strjoin(char *s1, char const *s2)
+static char	*ft_strjoin(char *s1, char *s2)
 {
 	char	*str;
 	size_t	j;
@@ -55,13 +55,15 @@ char	*ft_strjoin(char *s1, char const *s2)
 	return (str);
 }
 
-void	ft_buffflusher(char *buff)
+static void	ft_buffflusher(char *buff)
 {
 	int	i;
 	int	j;
 
 	i = 0;
 	j = 0;
+	if (!buff)
+		return ;
 	while (i < BUFFER_SIZE && buff[i] != 10)
 		i++;
 	if (buff[i] == 10 && i < BUFFER_SIZE)

@@ -6,7 +6,7 @@
 /*   By: framador <framador@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/17 16:30:43 by framador          #+#    #+#             */
-/*   Updated: 2023/11/17 17:45:20 by framador         ###   ########.fr       */
+/*   Updated: 2025/05/31 12:38:19 by framador         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ char	*get_next_line(int fd)
 	static char	buff[FOPEN_MAX][BUFFER_SIZE + 1];
 
 	str = NULL;
-	if (fd < 0 || BUFFER_SIZE < 1 || read(fd, 0, 0) < 0 || fd >= FOPEN_MAX)
+	if (fd < 0 || BUFFER_SIZE < 1 || fd >= FOPEN_MAX)
 	{
 		if (BUFFER_SIZE > 0)
 		{
@@ -26,9 +26,11 @@ char	*get_next_line(int fd)
 			return (NULL);
 		}
 	}
-	while (buff[fd][0] || read(fd, buff[fd], BUFFER_SIZE) > 0)
+	while (buff[fd][0] || read(fd, buff, BUFFER_SIZE) > 0)
 	{
 		str = ft_strjoin(str, buff[fd]);
+		if (!str)
+			return (NULL);
 		ft_buffflusher(buff[fd]);
 		if (str[ft_strlen(str) - 1] == 10)
 			break ;
