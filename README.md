@@ -32,6 +32,73 @@ Read a file line by line with minimal system calls, ideal for large files or con
 Not thread-safe by default (shared buffer state). For threaded use, pair with mutexes or thread-local storage.
 
 
+Here's an animated ASCII diagram showing the static buffer's lifecycle in action:
+
+```
+[Initial State]
+Buffer: [\0,\0,\0,\0,\0,\0,\0,\0]  (BUFFER_SIZE=8)
+
+1. First read(): "Hello\nWo"
+   Buffer: [H,e,l,l,o,\n,W,o]
+   ├─ Extracted: "Hello\n"
+   └─ Post-flush:
+      Buffer: [W,o,\0,\0,\0,\0,\0,\0]
+
+2. Second read(): "rld\n"
+   Buffer: [W,o,r,l,d,\n,\0,\0]
+   ├─ Extracted: "World\n"
+   └─ Post-flush:
+      Buffer: [\0,\0,\0,\0,\0,\0,\0,\0]
+
+3. EOF reached
+```
+
+### Animated Flow:
+```mermaid
+sequenceDiagram
+    participant Caller
+    participant GNL
+    participant Buffer
+    
+    Caller->>GNL: get_next_line(fd)
+    GNL->>Buffer: Is empty? → read()
+    Buffer-->>GNL: [H,e,l,l,o,\n,W,o]
+    GNL->>Caller: "Hello\n"
+    GNL->>Buffer: Flush (keep "Wo")
+    
+    Caller->>GNL: get_next_line(fd)
+    GNL->>Buffer: Has "Wo" → read() more
+    Buffer-->>GNL: "Wo" + "rld\n" → [W,o,r,l,d,\n]
+    GNL->>Caller: "World\n"
+    GNL->>Buffer: Flush (empty)
+    
+    Caller->>GNL: get_next_line(fd)
+    GNL->>Buffer: Empty + EOF → NULL
+```
+
+### Key Advantages Visualized:
+1. **Persistent State**  
+   ```
+   Before flush: [A,B,\n,C,D,\0,\0]
+   After flush:  [C,D,\0,\0,\0,\0,\0]
+   ```
+
+2. **No Redundant Reads**  
+   ```c
+   // Only reads when buffer exhausted
+   if (buff[0] == '\0') 
+       read(fd, buff, BUFFER_SIZE);
+   ```
+
+3. **Memory Safe**  
+   - Fixed-size buffer prevents overflow
+   - Always null-terminated (`+1` slot)
+
+Would you like me to:
+1. Add color-coding to the ASCII art?
+2. Include a performance comparison table?
+3. Show the buffer states during edge cases (empty lines/binary)?
+
 ---
 
 
