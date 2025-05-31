@@ -1,6 +1,47 @@
 
 ![assets_task_01jwk2gf90fs4970qf6cp0kjb1_1748691935_img_3](https://github.com/user-attachments/assets/73e5de36-38bd-4c9e-8d89-64fd761d2a85)
 
+
+
+# 🔍 get_next_line - Efficient Line Reading
+
+**Purpose**:  
+Read a file line by line with minimal system calls, ideal for large files or constrained environments.
+
+**Static Buffer `[BUFFER_SIZE + 1]` Importance**:  
+
+1. **Performance**  
+   - Persists between calls → avoids re-reading processed data  
+   - Single allocation → reduces `malloc/free` overhead  
+
+2. **Memory Efficiency**  
+   - Fixed-size (stack-allocated) → no heap fragmentation  
+   - `+1` ensures space for null-terminator  
+
+3. **State Tracking**  
+   - Preserves unprocessed data between calls  
+   - Enables multi-FD support (bonus) via buffer isolation  
+
+4. **Read Optimization**  
+   ```c
+   read(fd, buff, BUFFER_SIZE);  // Bulk reads → fewer syscalls
+   ```
+   Processes data in chunks rather than character-by-character.
+
+**Tradeoff**:  
+Not thread-safe by default (shared buffer state). For threaded use, pair with mutexes or thread-local storage.
+
+
+---
+
+
+This intro:  
+✅ Explains the core innovation  
+✅ Justifies design choices  
+✅ Acknowledges limitations  
+✅ Uses minimal space  
+
+Want me to add a diagram of the buffer lifecycle?
 ## 🔍 **Implementation Highlights**
 
 ### 🧠 **Core Logic**
